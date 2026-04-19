@@ -1,45 +1,111 @@
-# Claude Code Dev Environment Template
+# Viral's Claude Code Agents
 
-A reusable starter for new projects. Clone it and you instantly get a routed
-multi-agent setup (backend, frontend, test) plus a global `CLAUDE.md`.
+A bundle of five custom Claude Code agents that route work through planning,
+implementation, and testing — plus a one-shot project profiler that keeps each
+agent's context small.
 
 ## What's inside
 
 ```
 .
-├── CLAUDE.md                       # Global rules + agent routing
+├── CLAUDE.md                           # Global rules + agent routing
+├── install.sh                          # Install script (bash / Git Bash)
+├── install.ps1                         # Install script (PowerShell)
 ├── .claude/
 │   └── agents/
-│       ├── backend-dev.md          # Backend specialist
-│       ├── frontend-dev.md         # Frontend specialist
-│       └── test-generator.md       # Auto-runs after the others
+│       ├── project-scout.md            # Profiles the repo → viral-agents.md
+│       ├── requirements-planner.md     # Clarifies + plans before any build
+│       ├── backend-dev.md              # Backend specialist
+│       ├── frontend-dev.md             # Frontend specialist
+│       └── test-generator.md           # Auto-runs after backend/frontend
 └── .gitignore
 ```
 
-## Usage
+## Install
 
-### Option A — start a brand-new project from this template
+Clone this repo's `main` branch once, then run the installer.
 
-```bash
-git clone <this-repo-url> my-new-project
-cd my-new-project
-rm -rf .git && git init -b main      # detach from the template's history
-```
+### Global install (recommended — once per machine)
 
-Then open the folder in Claude Code. Agents are picked up automatically.
-
-### Option B — drop the agents into an existing project
+Agents go into `~/.claude/agents/` and apply to **every** project you open.
 
 ```bash
-# from inside an existing repo
-git clone <this-repo-url> /tmp/agents-template
-cp -r /tmp/agents-template/.claude .
-cp /tmp/agents-template/CLAUDE.md .   # or merge with your existing CLAUDE.md
+git clone --depth 1 --single-branch --branch main <this-repo-url> /tmp/viral-agents
+cd /tmp/viral-agents
+./install.sh              # bash / Git Bash
+# or
+.\install.ps1             # PowerShell
+cd - && rm -rf /tmp/viral-agents
 ```
+
+### Per-project install
+
+Drop the agents into one specific project. The script also appends
+`.claude/agents/`, `CLAUDE.md`, and `viral-agents.md` to that project's
+`.gitignore` so nothing gets committed.
+
+```bash
+./install.sh --project /path/to/your/project
+# or
+.\install.ps1 -Project C:\code\my-app
+```
+
+### Flags
+
+- `--no-claude-md` / `-NoClaudeMd` — skip copying `CLAUDE.md` (keeps any
+  existing one at the destination)
+- `--help` / `-Help`
+
+Both scripts are idempotent — re-run any time to refresh after you update this repo.
+
+## Flow — how the agents route
+
+```
+  ┌───────────────────┐
+  │  project-scout    │  (once per clone) → writes viral-agents.md
+  └─────────┬─────────┘
+            │
+  ┌─────────▼─────────┐
+  │requirements-planner│  (any new feature/idea) → asks questions → plan → approval
+  └─────────┬─────────┘
+            │
+     ┌──────┴──────┐
+     ▼             ▼
+┌──────────┐  ┌──────────┐
+│backend-  │  │frontend- │
+│  dev     │  │  dev     │
+└─────┬────┘  └─────┬────┘
+      └─────┬───────┘
+            ▼
+  ┌───────────────────┐
+  │  test-generator   │  (auto-triggered after any feature ships)
+  └───────────────────┘
+```
+
+| Task type                                        | Agent                  |
+| ------------------------------------------------ | ---------------------- |
+| First-time setup of a clone                      | `project-scout`        |
+| New requirement, feature, or vague idea          | `requirements-planner` |
+| API, DB, auth, migration, server logic           | `backend-dev`          |
+| Component, page, styling, state, routing         | `frontend-dev`         |
+| After any feature ships                          | `test-generator` (auto)|
+
+Routing rules live in `CLAUDE.md`. Edit per project as needed.
+
+## viral-agents.md — per-project context file
+
+Every agent loads `./viral-agents.md` at the start of its task instead of
+re-scanning `package.json`, config files, and folder trees. This keeps session
+context small and consistent across agents.
+
+- Generated once by `project-scout` after you install into a project
+- Gitignored by default (per-clone, not shared)
+- Re-run `project-scout` whenever the stack, folder layout, or conventions change
 
 ## One-time per machine — install skill marketplaces
 
-These are slash commands; type each one in the Claude Code prompt:
+The agents prefer skills from these marketplaces when they apply. Type each
+command in the Claude Code prompt:
 
 ```
 /plugin marketplace add anthropics/skills
@@ -47,17 +113,19 @@ These are slash commands; type each one in the Claude Code prompt:
 /plugin marketplace add mhattingpete/claude-skills-marketplace
 ```
 
-Then run `/plugin` to browse each marketplace and install the plugins you want
-(e.g. `fullstack-engineer`, `engineering-workflow`, `document-skills`,
-`example-skills`). The exact `name@marketplace` IDs are visible in the
-`/plugin` browser.
+Then run `/plugin` to browse and install — e.g. `fullstack-engineer`,
+`engineering-workflow`, `document-skills`, `example-skills`.
 
-## How the agents route
+## Updating
 
-| Task type                           | Agent          |
-| ----------------------------------- | -------------- |
-| API, DB, auth, migration, server    | `backend-dev`  |
-| Component, page, styling, state     | `frontend-dev` |
-| After any feature ships             | `test-generator` (auto) |
+After you edit agents in this repo and push:
 
-Routing rules live in `CLAUDE.md`. Edit per project as needed.
+```bash
+cd /tmp/viral-agents && git pull && ./install.sh
+```
+
+Or per-project:
+
+```bash
+cd /path/to/clone && git pull && ./install.sh --project /path/to/project
+```
