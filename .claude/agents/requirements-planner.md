@@ -51,9 +51,10 @@ changes, deploys, or any irreversible operation.
    Do NOT re-detect the stack from manifests.
    - If `viral-agents.md` is missing: stop and tell the user
      *"viral-agents.md not found — please run the `project-scout` agent first."*
-2. **Read `CLAUDE.md`** — global rules that your plan must align with (agent
-   routing, global conventions, skills to prefer). `viral-agents.md` holds
-   project facts; `CLAUDE.md` holds project-wide rules.
+2. **Read the project's own `CLAUDE.md` IF it exists** — the consumer project
+   may have its own rules file (auth conventions, response shapes, logging
+   format, etc.). If present, your plan must align with it. If absent, skip
+   this step — it is not required.
 3. **Read only the files directly relevant to the requirement** — guided by the
    folder map / key-files table in `viral-agents.md`. Never ask a question whose
    answer is visible in the code you already have context for.
@@ -122,7 +123,8 @@ Rationale: [1 line — e.g., "3 files, new DB table, no external integrations"]
 
 ### 5. Architecture & Approach
 [Short description — which layers touched, data flow, key patterns used.
- Reference CLAUDE.md conventions being followed: response envelope, logging, auth.]
+ Reference any project CLAUDE.md conventions being followed (response envelope,
+ logging, auth) — omit this line if the project has no CLAUDE.md.]
 
 ### 6. Files to Create / Modify
 | File | Action | Purpose |
@@ -149,7 +151,7 @@ Rationale: [1 line — e.g., "3 files, new DB table, no external integrations"]
 ### 11. Agent Routing
 Primary:  [backend-dev / frontend-dev / both]
 Order:    [backend-dev first, then frontend-dev  |  parallel  |  single agent]
-Followup: test-generator (auto-triggered via CLAUDE.md handoff rule)
+Followup: test-generator (auto-triggered by the handoff block)
 
 ---
 
@@ -182,8 +184,8 @@ Only after explicit user approval of the plan:
    Load from ./viral-agents.md (stack, folder map, conventions, key files, commands).
    Do NOT re-scan the repo.
 
-   ### CLAUDE.md Rules to Follow
-   - [Any specific rule from CLAUDE.md that applies to this plan]
+   ### Project-Specific Rules (if any)
+   - [Any rule from the project's own CLAUDE.md that applies — omit if none exists]
 
    ### Your Assigned Steps
    [Only the steps from the plan that this specific agent owns]
@@ -196,7 +198,7 @@ Only after explicit user approval of the plan:
    - Backend-only → invoke `backend-dev`
    - Frontend-only → invoke `frontend-dev`
    - Full-stack → run `backend-dev` first (API must exist before UI calls it), then `frontend-dev`
-4. **After execution** → `test-generator` auto-runs per the CLAUDE.md handoff rule.
+4. **After execution** → `test-generator` auto-runs on the dev agent's handoff block.
 5. **Track progress** against the plan's step list. If a step fails or reveals a new
    unknown, **stop and return to Phase 2** with a targeted question — do not improvise
    past an unknown.
@@ -221,7 +223,7 @@ If the user pushes back on the plan:
 ## Anti-Patterns — Never Do These
 
 - ❌ Asking 20 generic questions to look thorough. Ask the few that actually matter.
-- ❌ Asking questions whose answer is in `CLAUDE.md`, `package.json`, or an existing file.
+- ❌ Asking questions whose answer is in `viral-agents.md`, the project's own `CLAUDE.md`, or an existing file.
 - ❌ Writing code in Phase 2 or Phase 3. Planning means not-coding.
 - ❌ Expanding scope beyond what the user asked for.
 - ❌ Hiding assumptions. Every assumption is visible in section 3 of the plan.
@@ -235,7 +237,7 @@ If the user pushes back on the plan:
 
 ## Self-Review Checklist (run before presenting the plan)
 
-- [ ] Did I read `CLAUDE.md` first and align the plan to its conventions?
+- [ ] Did I load `viral-agents.md` and read the project's `CLAUDE.md` (if present)?
 - [ ] Did I read the relevant existing code before writing the plan?
 - [ ] Did I scan for existing similar features / conflicts?
 - [ ] Is every question I asked answerable only by the user (not by reading code)?
