@@ -8,7 +8,6 @@ agent's context small.
 
 ```
 .
-├── CLAUDE.md                           # Global rules + agent routing
 ├── install.sh                          # Install script (bash / Git Bash)
 ├── install.ps1                         # Install script (PowerShell)
 ├── .claude/
@@ -18,8 +17,12 @@ agent's context small.
 │       ├── backend-dev.md              # Backend specialist
 │       ├── frontend-dev.md             # Frontend specialist
 │       └── test-generator.md           # Auto-runs after backend/frontend
+├── CLAUDE.md                           # Local — for editing this repo, NOT shipped
 └── .gitignore
 ```
+
+> `CLAUDE.md` is guidance for working in *this* repo only. The install scripts
+> do **not** copy it into consumer projects — only the agent `.md` files ship.
 
 ## Install
 
@@ -41,8 +44,8 @@ cd - && rm -rf /tmp/viral-agents
 ### Per-project install
 
 Drop the agents into one specific project. The script also appends
-`.claude/agents/`, `CLAUDE.md`, and `viral-agents.md` to that project's
-`.gitignore` so nothing gets committed.
+`.claude/agents/` and `viral-agents.md` to that project's `.gitignore` so
+nothing gets committed.
 
 ```bash
 ./install.sh --project /path/to/your/project
@@ -52,9 +55,7 @@ Drop the agents into one specific project. The script also appends
 
 ### Flags
 
-- `--no-claude-md` / `-NoClaudeMd` — skip copying `CLAUDE.md` (keeps any
-  existing one at the destination)
-- `--help` / `-Help`
+- `--help` / `-Help` — usage
 
 Both scripts are idempotent — re-run any time to refresh after you update this repo.
 
